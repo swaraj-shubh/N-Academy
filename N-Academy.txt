@@ -257,6 +257,12 @@ Redis (sessions, devices)
         ↓
 AWS S3 + CloudFront (media)
 
+| Endpoint                               | Role    | Description       |
+| -------------------------------------- | ------- | ----------------- |
+| `GET /api/dashboard/student/dashboard` | student | Student dashboard |
+| `GET /api/dashboard/teacher/dashboard` | teacher | Teacher dashboard |
+| `GET /api/dashboard/admin/users`       | admin   | List all users    |
+| `GET /api/dashboard/profile`           | all     | Profile page      |
 
 
 

@@ -8,7 +8,8 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/auth.routes.js";
 import testRoutes from "./routes/test.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
-
+import courseRoutes from "./routes/course.routes.js"; 
+import enrollmentRoutes from "./routes/enrollment.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { rateLimiter } from "./middlewares/rateLimit.middleware.js";
 
@@ -27,6 +28,8 @@ app.use(rateLimiter);
 app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/enrollments", enrollmentRoutes);  
 
 app.get('/', (req, res) => res.send('✅ API is running...hehe'));
 

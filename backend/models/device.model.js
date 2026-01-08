@@ -2,9 +2,20 @@ import mongoose from "mongoose";
 
 const deviceSchema = new mongoose.Schema(
   {
-    userId: mongoose.Types.ObjectId,
-    deviceId: String,
-    active: Boolean,
+    userId: { 
+      type: mongoose.Types.ObjectId, 
+      ref: "User", 
+      required: true 
+    },
+    deviceId: { 
+      type: String, 
+      required: true,
+      // unique: true 
+    },
+    active: { 
+      type: Boolean, 
+      default: true 
+    },
   },
   { timestamps: true }
 );
