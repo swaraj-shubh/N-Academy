@@ -19,7 +19,7 @@ const app = express();
 
 // security
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(rateLimiter);
