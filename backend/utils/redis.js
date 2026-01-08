@@ -1,7 +1,7 @@
 import Redis from "ioredis";
 
 let redis;
-
+console.log("REDIS_URL:", process.env.REDIS_URL);
 if (process.env.REDIS_URL) {
   // Scenario 1: Production (Deployment)
   // If a REDIS_URL exists, we use it directly. 
