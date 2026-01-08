@@ -1,0 +1,283 @@
+Frontend (Web):
+- Next.js (Admin + Teacher panels)
+
+Mobile App:
+- Flutter (Students)
+
+Backend:
+- Node.js + Express
+
+Database:
+- MongoDB Atlas
+
+Cache:
+- Redis
+
+Storage:
+- AWS S3 + CloudFront
+
+
+
+===============================================================================================================
+
+
+
+🌐 FRONTEND (WEB) — Next.js (Admin + Teacher)
+
+Framework: Next.js (App Router) + TypeScript
+Auth: JWT + Role-based guards
+UI: Tailwind + shadcn/ui
+📁 web/ (Next.js)
+web/
+├── app/
+│   ├── (auth)/
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   ├── forgot-password/
+│   │   └── reset-password/
+│   │
+│   ├── admin/
+│   │   ├── dashboard/
+│   │   │   └── page.tsx
+│   │   ├── teachers/
+│   │   ├── students/
+│   │   ├── courses/
+│   │   ├── payments/
+│   │   ├── analytics/
+│   │   └── settings/
+│   │
+│   ├── teacher/
+│   │   ├── dashboard/
+│   │   ├── courses/
+│   │   ├── live-classes/
+│   │   ├── recordings/
+│   │   └── earnings/
+│   │
+│   ├── api/
+│   │   └── auth/
+│   │       └── refresh/route.ts
+│   │
+│   ├── layout.tsx
+│   ├── globals.css
+│   └── page.tsx
+│
+├── components/
+│   ├── ui/                # shadcn
+│   ├── layout/
+│   ├── tables/
+│   ├── charts/
+│   └── modals/
+│
+├── lib/
+│   ├── api.ts             # axios instance
+│   ├── auth.ts
+│   ├── permissions.ts
+│   └── constants.ts
+│
+├── hooks/
+│   ├── useAuth.ts
+│   ├── useRole.ts
+│   └── useSocket.ts
+│
+├── middleware.ts          # role guard
+├── public/
+├── types/
+├── next.config.js
+└── tsconfig.json
+🔐 Web Auth Strategy
+Access token → HTTP-only cookie
+Refresh token → Next API route
+Role-based route protection in middleware.ts
+
+
+
+===============================================================================================================
+
+⚙️ BACKEND — Node.js + Express (JavaScript)
+
+🔥 THIS IS THE MAIN CHANGE
+
+🎯 Design Goals
+
+Simple to understand
+
+Easy to debug
+
+Nest-like modularity
+
+Scales horizontally
+
+Easy future migration
+
+📁 backend/ (Express + JS)
+backend/
+├── src/
+│   ├── app.js                 # Express app config
+│   ├── server.js              # Server bootstrap
+│
+│   ├── config/
+│   │   ├── env.js
+│   │   ├── db.js              # MongoDB connection
+│   │   ├── redis.js
+│   │   └── aws.js
+│
+│   ├── modules/
+│   │
+│   │   ├── auth/
+│   │   │   ├── auth.controller.js
+│   │   │   ├── auth.service.js
+│   │   │   ├── auth.routes.js
+│   │   │   └── auth.middleware.js
+│   │
+│   │   ├── users/
+│   │   │   ├── user.model.js
+│   │   │   ├── users.controller.js
+│   │   │   ├── users.service.js
+│   │   │   └── users.routes.js
+│   │
+│   │   ├── devices/
+│   │   │   ├── device.model.js
+│   │   │   └── devices.service.js
+│   │
+│   │   ├── courses/
+│   │   │   ├── course.model.js
+│   │   │   ├── courses.controller.js
+│   │   │   ├── courses.service.js
+│   │   │   └── courses.routes.js
+│   │
+│   │   ├── purchases/
+│   │   │   ├── purchase.model.js
+│   │   │   └── purchases.service.js
+│   │
+│   │   ├── payments/
+│   │   │   ├── razorpay.service.js
+│   │   │   ├── payments.controller.js
+│   │   │   └── webhook.routes.js
+│   │
+│   │   ├── live/
+│   │   │   ├── live.socket.js
+│   │   │   └── live.service.js
+│   │
+│   │   ├── storage/
+│   │   │   ├── s3.service.js
+│   │   │   └── cloudfront.util.js
+│   │
+│   ├── middlewares/
+│   │   ├── auth.middleware.js
+│   │   ├── role.middleware.js
+│   │   ├── rateLimit.middleware.js
+│   │   └── error.middleware.js
+│
+│   ├── utils/
+│   │   ├── jwt.js
+│   │   ├── hash.js
+│   │   └── response.js
+│
+│   ├── routes.js              # Central route loader
+│
+├── .env
+├── package.json
+├── docker-compose.yml
+└── README.md
+
+🔐 Backend Security (UNCHANGED LOGIC)
+
+✔ JWT + Refresh Tokens
+✔ One-user-one-device enforcement
+✔ Redis-backed sessions
+✔ Rate limiting
+✔ IP throttling
+✔ Signed S3 URLs (5–10 min)
+✔ Webhook verification
+
+Express does NOT reduce security if structured properly.
+
+
+
+===============================================================================================================
+
+
+
+
+📱 MOBILE APP — Flutter (Students)
+
+State Mgmt: Riverpod / Bloc
+Video: Custom HLS Player
+Security: Screen block + device lock
+
+📁 mobile/ (Flutter)
+
+N-Academy/
+├── lib/
+│   ├── core/
+│   │   ├── constants/
+│   │   ├── services/
+│   │   ├── theme/
+│   │   └── utils/
+│
+│   ├── auth/
+│   │   ├── login/
+│   │   ├── register/
+│   │   └── auth_provider.dart
+│
+│   ├── dashboard/
+│   │   ├── home/
+│   │   ├── my_courses/
+│   │   ├── live_classes/
+│   │   └── profile/
+│
+│   ├── course/
+│   │   ├── course_details/
+│   │   ├── video_player/
+│   │   └── notes/
+│
+│   ├── payments/
+│   ├── models/
+│   ├── providers/
+│   └── main.dart
+│
+├── android/
+├── ios/
+├── pubspec.yaml
+└── analysis_options.yaml
+🚫 Flutter Security
+FLAG_SECURE (Android)
+iOS screen capture detection
+App pauses video if detected
+Device ID sent on login
+
+🔄 API FLOW (Simple Overview)
+Flutter App / Next.js Web
+        ↓
+Node.js + Express API
+        ↓
+MongoDB Atlas (data)
+        ↓
+Redis (sessions, devices)
+        ↓
+AWS S3 + CloudFront (media)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
