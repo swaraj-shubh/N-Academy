@@ -5,8 +5,8 @@ import '../providers/auth_provider.dart';
 import 'auth/login_screen.dart';
 import '../../core/theme/colors.dart';
 import '../../core/theme/text_styles.dart';
-import '../../core/utils/navigation_service.dart';
-import '../../core/constants/app_constants.dart';
+// import '../../core/utils/navigation_service.dart';
+// import '../../core/constants/app_constants.dart';
 import '../../data/models/user_model.dart';
 
 class ProfileScreen extends StatelessWidget {

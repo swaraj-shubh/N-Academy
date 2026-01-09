@@ -1,6 +1,6 @@
 // presentation/screens/courses/courses_screen.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 import '../../../data/repositories/course_repository.dart';
 import '../../../data/models/course_model.dart';
 import 'course_detail_screen.dart';
