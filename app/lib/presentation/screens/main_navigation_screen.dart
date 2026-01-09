@@ -5,6 +5,10 @@ import '../providers/auth_provider.dart';
 import 'home_screen.dart';
 import 'courses/courses_screen.dart';
 import 'profile_screen.dart';
+import 'teacher/teacher_dashboard.dart';
+import 'student/student_dashboard.dart';
+import 'auth/login_screen.dart'; // Add this import
+import '../../data/models/user_model.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -16,12 +20,61 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    const HomeScreen(),
-    const CoursesScreen(),
-    const ProfileScreen(),
-  ];
+  // Get pages based on user role
+  List<Widget> get _pages {
+    final user = context.read<AuthProvider>().user;
+    
+    return [
+      const HomeScreen(),
+      const CoursesScreen(),
+      _getDashboardPage(user), // Dashboard page changes based on role
+      const ProfileScreen(),
+    ];
+  }
 
+  // Get dashboard page based on role
+  Widget _getDashboardPage(UserModel? user) {
+    if (user?.isTeacher ?? false) {
+      return const TeacherDashboardScreen();
+    } else if (user?.isAdmin ?? false) {
+      return _buildAdminDashboard();
+    } else {
+      return const StudentDashboardScreen(); // Updated to use new StudentDashboardScreen
+    }
+  }
+
+  // Admin Dashboard
+  Widget _buildAdminDashboard() {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Admin Dashboard'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.admin_panel_settings, size: 80, color: Colors.grey),
+            const SizedBox(height: 20),
+            Text(
+              'Admin Dashboard',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Manage platform users and courses',
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Navigation items - same for all users
   final List<BottomNavigationBarItem> _navItems = [
     const BottomNavigationBarItem(
       icon: Icon(Icons.home_outlined),
@@ -34,28 +87,34 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       label: 'Courses',
     ),
     const BottomNavigationBarItem(
+      icon: Icon(Icons.dashboard_outlined),
+      activeIcon: Icon(Icons.dashboard),
+      label: 'Dashboard',
+    ),
+    const BottomNavigationBarItem(
       icon: Icon(Icons.person_outlined),
       activeIcon: Icon(Icons.person),
       label: 'Profile',
     ),
   ];
 
-// presentation/screens/main_navigation_screen.dart
-// Update the build method:
-
   @override
   Widget build(BuildContext context) {
-  final user = context.watch<AuthProvider>().user;
+    final user = context.watch<AuthProvider>().user;
 
-  return Scaffold(
-    backgroundColor: Colors.white, // Add this line
-    appBar: AppBar(
-      title: Text(_getAppBarTitle(_selectedIndex)),
-      backgroundColor: Colors.white, // Ensure white app bar
-      foregroundColor: Colors.black, // Ensure dark text
-      elevation: 0,
-      actions: [
-        if (user != null)
+    // CHECK IF USER IS NOT LOGGED IN
+    if (user == null) {
+      return _buildNotLoggedInScreen(context);
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(_getAppBarTitle(_selectedIndex, user)),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+        actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: CircleAvatar(
@@ -69,36 +128,138 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               ),
             ),
           ),
-      ],
-    ),
-    body: IndexedStack(
-      index: _selectedIndex,
-      children: _pages,
-    ),
-    bottomNavigationBar: BottomNavigationBar(
-      currentIndex: _selectedIndex,
-      onTap: (index) {
-        setState(() {
-          _selectedIndex = index;
-        });
-      },
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: Theme.of(context).primaryColor,
-      unselectedItemColor: Colors.grey[600],
-      backgroundColor: Colors.white,
-      elevation: 8,
-      items: _navItems,
-    ),
-  );
-}
+        ],
+      ),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Colors.grey[600],
+        backgroundColor: Colors.white,
+        elevation: 8,
+        items: _navItems,
+      ),
+    );
+  }
+
+  // Screen shown when user is not logged in
+  Widget _buildNotLoggedInScreen(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('N Academy'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.lock_outline,
+                size: 100,
+                color: Colors.grey,
+              ),
+              const SizedBox(height: 30),
+              Text(
+                'Login Required',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                'You need to login to access the app features',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: 200,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.login, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text(
+                        'Go to Login',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  // Optional: Add registration navigation
+                },
+                child: Text(
+                  'Don\'t have an account? Sign up',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
   
-  String _getAppBarTitle(int index) {
+  String _getAppBarTitle(int index, UserModel user) {
     switch (index) {
       case 0:
         return 'Welcome';
       case 1:
         return 'Courses';
       case 2:
+        // Dashboard title based on role
+        if (user.isTeacher) {
+          return 'Teacher Dashboard';
+        } else if (user.isAdmin) {
+          return 'Admin Dashboard';
+        } else {
+          return 'Student Dashboard';
+        }
+      case 3:
         return 'Profile';
       default:
         return 'N Academy';

@@ -1,3 +1,4 @@
+// data/models/course_model.dart
 class CourseModel {
   final String id;
   final String title;

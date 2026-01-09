@@ -47,12 +47,19 @@ class ApiClient {
     // Add device ID
     String deviceId = await _getOrCreateDeviceId();
     options.headers['x-device-id'] = deviceId;
+    print('📱 Device ID: $deviceId');
     
     // Add access token if available
     final accessToken = await _storage.read(key: AppConstants.accessTokenKey);
+    print('🔑 Access Token: ${accessToken != null ? "Present" : "Missing"}');
+    
     if (accessToken != null && accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $accessToken';
+      print('✅ Authorization header set');
     }
+    
+    print('🌐 Request to: ${options.baseUrl}${options.path}');
+    print('📤 Headers: ${options.headers}');
     
     handler.next(options);
   }
@@ -178,6 +185,18 @@ class ApiClient {
 
   Future<Response> enrollCourse(String courseId) async {
     return post('${AppConstants.enrollEndpoint}/$courseId');
+  }
+
+  Future<Response> getStudentDashboard() async {
+    return get(AppConstants.studentDashboardEndpoint);
+  }
+  
+  Future<Response> getTeacherDashboard() async {
+    return get(AppConstants.teacherDashboardEndpoint);
+  }
+  
+  Future<Response> getAdminUsers() async {
+    return get(AppConstants.adminUsersEndpoint);
   }
 
   Future<Response> getMyCourses() async {

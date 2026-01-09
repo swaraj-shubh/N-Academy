@@ -9,10 +9,16 @@ class AppConstants {
   static const String registerEndpoint = "/auth/register";
   static const String logoutEndpoint = "/auth/logout";
   static const String refreshEndpoint = "/auth/refresh";
-  static const String profileEndpoint = "/dashboard/profile";
+
   static const String coursesEndpoint = "/courses";
   static const String enrollEndpoint = "/enrollments";
   static const String myCoursesEndpoint = "/enrollments/my-courses";
+
+  static const String profileEndpoint = "/dashboard/profile";
+  static const String teacherDashboardEndpoint = "/dashboard/teacher/dashboard";
+  static const String adminUsersEndpoint = "/dashboard/admin/users"; // ADD
+  static const String studentDashboardEndpoint = "/dashboard/student/dashboard";
+
   
   // Storage Keys
   static const String accessTokenKey = "access_token";
