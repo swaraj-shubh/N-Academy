@@ -43,5 +43,12 @@ export const loginUser = async ({ email, password, deviceId }) => {
   return {
     accessToken: signAccessToken({ id: user._id, role: user.role }),
     refreshToken: signRefreshToken({ id: user._id }),
+    user: { // Add user data here!
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
   };
 };
