@@ -28,7 +28,19 @@ export const refreshToken = async (req, res, next) => {
 export const register = async (req, res, next) => {
   try {
     const user = await registerUser(req.body);
-    ok(res, user, "User registered");
+    
+    // Return user data along with success message
+    res.json({
+      success: true,
+      message: "User registered",
+      data: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }
+    });
   } catch (e) {
     next(e);
   }
