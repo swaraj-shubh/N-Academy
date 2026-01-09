@@ -14,8 +14,8 @@ router.post(
 
 router.get(
   "/",
-  protect,
-  allowRoles("student"),
+  // protect,
+  // allowRoles("student"),
   listCourses
 );
 
