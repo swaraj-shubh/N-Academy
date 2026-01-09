@@ -1,3 +1,4 @@
+// data/repositories/auth_repository.dart
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../data_sources/api_client.dart';
@@ -10,39 +11,46 @@ class AuthRepository {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<AuthResponse> login(String email, String password) async {
-    try {
-      final response = await _apiClient.login(email, password);
+    print('🔐 AuthRepository: Attempting login for $email');
+    
+    final response = await _apiClient.login(email, password);
+
+    print('📡 AuthRepository: Response status: ${response.statusCode}');
+    print('📡 AuthRepository: Response data: ${response.data}');
+    
+    if (response.statusCode == 200) {
+      final responseData = response.data as Map<String, dynamic>;
       
-      if (response.statusCode == 200) {
-        final data = response.data['data'];
-        final user = UserModel.fromJson(data['user'] ?? data);
-        
-        // Save tokens
-        await _storage.write(
-          key: AppConstants.accessTokenKey,
-          value: data['accessToken'],
-        );
-        await _storage.write(
-          key: AppConstants.refreshTokenKey,
-          value: data['refreshToken'],
-        );
-        
-        // Save user data
-        await _storage.write(
-          key: AppConstants.userDataKey,
-          value: jsonEncode(user.toJson()),
-        );
-        
-        return AuthResponse(
-          accessToken: data['accessToken'],
-          refreshToken: data['refreshToken'],
-          user: user,
-        );
-      } else {
-        throw Exception('Login failed: ${response.data['message']}');
+      if (responseData['success'] != true) {
+        throw Exception('Login failed: ${responseData['message'] ?? 'Unknown error'}');
       }
-    } catch (e) {
-      rethrow;
+      
+      final data = responseData['data'] as Map<String, dynamic>;
+      
+      // Parse the complete AuthResponse from data (which now includes user)
+      final auth = AuthResponse.fromJson(data);
+      
+      // Save tokens
+      await _storage.write(
+        key: AppConstants.accessTokenKey,
+        value: auth.accessToken,
+      );
+      await _storage.write(
+        key: AppConstants.refreshTokenKey,
+        value: auth.refreshToken,
+      );
+      
+      // Save user data
+      await _storage.write(
+        key: AppConstants.userDataKey,
+        value: jsonEncode(auth.user.toJson()),
+      );
+      
+      print('✅ AuthRepository: Login successful for ${auth.user.email}');
+      
+      return auth;
+    } else {
+      throw Exception('Login failed with status ${response.statusCode}');
     }
   }
 
@@ -55,10 +63,21 @@ class AuthRepository {
       final response = await _apiClient.register(email, password, role);
       
       if (response.statusCode == 200) {
-        final user = UserModel.fromJson(response.data['data']);
-        return user;
+        final responseData = response.data as Map<String, dynamic>;
+        
+        if (responseData['success'] != true) {
+          throw Exception('Registration failed: ${responseData['message'] ?? 'Unknown error'}');
+        }
+        
+        final data = responseData['data'];
+        if (data is Map<String, dynamic>) {
+          return UserModel.fromJson(data);
+        } else {
+          // If data is just the user object directly
+          return UserModel.fromJson(responseData['data'] as Map<String, dynamic>);
+        }
       } else {
-        throw Exception('Registration failed: ${response.data['message']}');
+        throw Exception('Registration failed with status ${response.statusCode}');
       }
     } catch (e) {
       rethrow;
@@ -67,11 +86,16 @@ class AuthRepository {
 
   Future<void> logout() async {
     try {
+      // Try to call backend logout
       await _apiClient.post(
         AppConstants.logoutEndpoint,
         data: {},
       );
+    } catch (e) {
+      // Even if backend logout fails, still clear local storage
+      print('Backend logout failed: $e');
     } finally {
+      // Always clear local storage
       await _apiClient.logout();
     }
   }
@@ -111,6 +135,7 @@ class AuthRepository {
       }
       return null;
     } catch (e) {
+      print('⚠️ getStoredUser error: $e');
       return null;
     }
   }

@@ -1,16 +1,18 @@
+// lib/data/data_sources/api_client.dart
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:cookie_jar/cookie_jar.dart';
+// import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+// import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/utils/navigation_service.dart';
 
 class ApiClient {
   late Dio _dio;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
-  final CookieJar _cookieJar = CookieJar();
+  // final CookieJar _cookieJar = CookieJar();
   static final ApiClient _instance = ApiClient._internal();
   
   factory ApiClient() => _instance;
@@ -29,7 +31,7 @@ class ApiClient {
     );
     
     // Add cookie manager
-    _dio.interceptors.add(CookieManager(_cookieJar));
+    // _dio.interceptors.add(CookieManager(_cookieJar));
     
     // Add interceptors
     _dio.interceptors.add(InterceptorsWrapper(
@@ -56,50 +58,38 @@ class ApiClient {
   }
 
   Future<void> _onError(
-    DioException error, 
-    ErrorInterceptorHandler handler
+    DioException error,
+    ErrorInterceptorHandler handler,
   ) async {
-    // Handle 401 Unauthorized
     if (error.response?.statusCode == 401) {
-      // Try to refresh token
-      final refreshToken = await _storage.read(
-        key: AppConstants.refreshTokenKey
-      );
-      
-      if (refreshToken != null && refreshToken.isNotEmpty) {
-        try {
-          final response = await _dio.post(
-            AppConstants.refreshEndpoint,
-            data: {'refreshToken': refreshToken},
+      try {
+        // Call refresh WITHOUT sending refreshToken manually
+        final response = await _dio.post(AppConstants.refreshEndpoint);
+
+        if (response.statusCode == 200 &&
+            response.data['success'] == true) {
+          final newAccessToken =
+              response.data['data']['accessToken'];
+
+          await _storage.write(
+            key: AppConstants.accessTokenKey,
+            value: newAccessToken,
           );
-          
-          if (response.statusCode == 200) {
-            final data = response.data;
-            if (data['success'] == true) {
-              final newAccessToken = data['accessToken'];
-              await _storage.write(
-                key: AppConstants.accessTokenKey,
-                value: newAccessToken,
-              );
-              
-              // Retry the original request
-              final request = error.requestOptions;
-              request.headers['Authorization'] = 'Bearer $newAccessToken';
-              final retryResponse = await _dio.fetch(request);
-              return handler.resolve(retryResponse);
-            }
-          }
-        } catch (e) {
-          // Refresh failed, logout
-          await logout();
-          // Navigate to login screen
-          // You might want to use a global navigator key here
+
+          // Retry original request
+          final request = error.requestOptions;
+          request.headers['Authorization'] =
+              'Bearer $newAccessToken';
+
+          final retryResponse = await _dio.fetch(request);
+          return handler.resolve(retryResponse);
         }
-      } else {
+      } catch (_) {
         await logout();
+        NavigationService.navigateReplacement(AppRoutes.login);
       }
     }
-    
+
     handler.next(error);
   }
 
@@ -117,7 +107,7 @@ class ApiClient {
     await _storage.delete(key: AppConstants.refreshTokenKey);
     await _storage.delete(key: AppConstants.userDataKey);
     // Clear cookies
-    _cookieJar.deleteAll();
+    // _cookieJar.deleteAll();
   }
 
   // API Methods
@@ -137,16 +127,30 @@ class ApiClient {
     return _dio.delete(path);
   }
 
-  // Auth Methods
   Future<Response> login(String email, String password) async {
-    return post(
-      AppConstants.loginEndpoint,
-      data: {
-        'email': email,
-        'password': password,
-        'deviceId': await _getOrCreateDeviceId(),
-      },
-    );
+    print('🌐 API Client: Sending login request to ${AppConstants.loginEndpoint}');
+    
+    try {
+      final response = await post(
+        AppConstants.loginEndpoint,
+        data: {
+          'email': email,
+          'password': password,
+          'deviceId': await _getOrCreateDeviceId(),
+        },
+      );
+      
+      print('✅ API Client: Login response received');
+      print('   Status: ${response.statusCode}');
+      print('   Headers: ${response.headers}');
+      print('   Data: ${response.data}');
+      print('   Data Type: ${response.data.runtimeType}');
+      
+      return response;
+    } catch (e) {
+      print('❌ API Client: Login request failed: $e');
+      rethrow;
+    }
   }
 
   Future<Response> register(

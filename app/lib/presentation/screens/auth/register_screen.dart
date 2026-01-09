@@ -49,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final success = await authProvider.register(
       _emailController.text.trim(),
       _passwordController.text,
-      _selectedRole,
+      'student', // Currently fixed to 'student' role
     );
     
     if (success) {
@@ -130,31 +130,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 20),
                     
                     // Role Selection
-                    DropdownButtonFormField<String>(
-                      value: _selectedRole,
-                      decoration: InputDecoration(
-                        labelText: 'I want to join as',
-                        prefixIcon: const Icon(Icons.person_outline),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'student',
-                          child: Text('Student'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'teacher',
-                          child: Text('Teacher'),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedRole = value!;
-                        });
-                      },
-                    ),
+                    // DropdownButtonFormField<String>(
+                    //   value: _selectedRole,
+                    //   decoration: InputDecoration(
+                    //     labelText: 'I want to join as',
+                    //     prefixIcon: const Icon(Icons.person_outline),
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //     ),
+                    //   ),
+                    //   items: const [
+                    //     DropdownMenuItem(
+                    //       value: 'student',
+                    //       child: Text('Student'),
+                    //     ),
+                    //     DropdownMenuItem(
+                    //       value: 'teacher',
+                    //       child: Text('Teacher'),
+                    //     ),
+                    //   ],
+                    //   onChanged: (value) {
+                    //     setState(() {
+                    //       _selectedRole = value!;
+                    //     });
+                    //   },
+                    // ),
                     const SizedBox(height: 20),
                     
                     TextFormField(

@@ -1,3 +1,4 @@
+// lib/presentation/screens/auth/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -5,6 +6,7 @@ import 'register_screen.dart';
 import '../home_screen.dart'; // ADD THIS
 import '../../../core/theme/colors.dart'; // ADD THIS
 import '../../../core/theme/text_styles.dart'; // ADD THIS
+import '../main_navigation_screen.dart'; // ADD THIS
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -39,7 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        // MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

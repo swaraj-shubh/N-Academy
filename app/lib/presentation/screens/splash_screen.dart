@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'auth/login_screen.dart';
-import 'home_screen.dart';
-import '../../core/constants/app_constants.dart'; // ADD THIS
-import '../../core/theme/colors.dart'; // ADD THIS
+import './main_navigation_screen.dart';
+import '../../core/constants/app_constants.dart';
+import '../../core/theme/colors.dart';
+// import timeout
+import 'dart:async';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,23 +19,79 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeApp();
+    // Add a small delay before starting initialization
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _initializeApp();
+    });
   }
 
   Future<void> _initializeApp() async {
-    await Future.delayed(const Duration(seconds: 2));
+    print('🚀 Splash: Starting...');
     
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final isLoggedIn = await authProvider.authRepository.isLoggedIn();
     
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => isLoggedIn 
-            ? const HomeScreen()
-            : const LoginScreen(),
-      ),
-    );
+    // First, wait for _loadStoredUser to complete
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    print('Splash: Local user check - ${authProvider.user?.email ?? "NULL"}');
+    
+    // If we have a user locally, go to main immediately
+    if (authProvider.user != null) {
+      print('✅ Splash: User exists locally, going to main');
+      _navigateToMain();
+      return;
+    }
+    
+    // If no local user, try to refresh (network call)
+    print('🔄 Splash: Trying refreshProfile...');
+    try {
+      await authProvider.refreshProfile().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          print('⏰ Splash: refreshProfile timeout');
+          throw TimeoutException('refreshProfile timeout');
+        },
+      );
+      
+      if (authProvider.user != null) {
+        print('✅ Splash: refreshProfile successful');
+        _navigateToMain();
+      } else {
+        print('⚠️ Splash: refreshProfile returned null user');
+        _navigateToLogin();
+      }
+    } catch (e) {
+      print('❌ Splash: refreshProfile failed: $e');
+      _navigateToLogin();
+    }
+  }
+
+  void _navigateToMain() {
+    if (!mounted) return;
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      
+      print('➡️ Splash: Navigating to MainNavigationScreen');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+      );
+    });
+  }
+
+  void _navigateToLogin() {
+    if (!mounted) return;
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      
+      print('➡️ Splash: Navigating to LoginScreen');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    });
   }
 
   @override
