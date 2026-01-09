@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'auth/login/login_screen.dart';
-import 'auth/register/register_screen.dart';
-import 'dashboard/home/home_screen.dart';
-import 'dashboard/profile/profile_screen.dart';
+import 'core/constants/app_constants.dart';
+import 'core/theme/app_theme.dart';
+import 'core/utils/navigation_service.dart';
+import 'presentation/providers/auth_provider.dart';
+import 'presentation/screens/splash_screen.dart';
+import 'presentation/screens/home_screen.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -15,14 +18,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      routes: {
-        "/login": (_) => const LoginScreen(),
-        "/register": (_) => const RegisterScreen(),
-        "/home": (_) => const HomeScreen(),
-        "/profile": (_) => const ProfileScreen(),
-      },
-      initialRoute: "/login",
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        Provider(create: (_) => const FlutterSecureStorage()),
+      ],
+      child: MaterialApp(
+        title: AppConstants.appName,
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.light,
+        home: const SplashScreen(),
+        navigatorKey: NavigationService.navigatorKey,
+        builder: (context, child) {
+          return GestureDetector(
+            onTap: () {
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus &&
+                  currentFocus.focusedChild != null) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              }
+            },
+            child: child,
+          );
+        },
+      ),
     );
   }
 }
