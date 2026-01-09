@@ -8,7 +8,7 @@ import 'core/theme/app_theme.dart';
 import 'core/utils/navigation_service.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/screens/splash_screen.dart';
-import 'presentation/screens/main_navigation_screen.dart'; // Add this
+// import 'presentation/screens/main_navigation_screen.dart'; // Add this
 
 void main() {
   runApp(const MyApp());
