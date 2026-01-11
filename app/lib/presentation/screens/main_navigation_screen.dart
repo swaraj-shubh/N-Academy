@@ -47,7 +47,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildAdminDashboard() {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.school,
+              color: Theme.of(context).primaryColor,
+              size: 28,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'N Academy',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
       ),
       body: Center(
         child: Column(
@@ -110,7 +131,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(_getAppBarTitle(_selectedIndex, user)),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.school,
+              color: Theme.of(context).primaryColor,
+              size: 28,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'N Academy',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ],
+        ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -155,7 +194,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildNotLoggedInScreen(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('N Academy'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.school,
+              color: Theme.of(context).primaryColor,
+              size: 28,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'N Academy',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ],
+        ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -244,25 +301,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
   
-  String _getAppBarTitle(int index, UserModel user) {
-    switch (index) {
-      case 0:
-        return 'Welcome';
-      case 1:
-        return 'Courses';
-      case 2:
-        // Dashboard title based on role
-        if (user.isTeacher) {
-          return 'Teacher Dashboard';
-        } else if (user.isAdmin) {
-          return 'Admin Dashboard';
-        } else {
-          return 'Student Dashboard';
-        }
-      case 3:
-        return 'Profile';
-      default:
-        return 'N Academy';
-    }
-  }
+  // String _getAppBarTitle(int index, UserModel user) {
+  //   return 'N Academy';
+  //   // switch (index) {
+  //   //   case 0:
+  //   //     return 'Welcome To N Academy';
+  //   //   case 1:
+  //   //     return 'Courses';
+  //   //   case 2:
+  //   //     // Dashboard title based on role
+  //   //     if (user.isTeacher) {
+  //   //       return 'Teacher Dashboard';
+  //   //     } else if (user.isAdmin) {
+  //   //       return 'Admin Dashboard';
+  //   //     } else {
+  //   //       return 'Student Dashboard';
+  //   //     }
+  //   //   case 3:
+  //   //     return 'Profile';
+  //   //   default:
+  //   //     return 'N Academy';
+  //   // }
+  // }
 }
